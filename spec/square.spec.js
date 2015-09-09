@@ -1,5 +1,3 @@
-var square = require('../src/square.js') ;
-
 describe('square', function() {
     it('should return the quare of the number it is passed', function() {
         expect(square(0)).toBe(0 * 0);
