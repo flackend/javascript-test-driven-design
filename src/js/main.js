@@ -1,0 +1,1 @@
+window.square = require('./modules/general/square.js');
