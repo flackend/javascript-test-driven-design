@@ -1,6 +1,6 @@
 {
   "name": "javascript-test-driven-design",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "Learning JavaScript TDD.",
   "main": "src/js/main.js",
   "dependencies": {},
