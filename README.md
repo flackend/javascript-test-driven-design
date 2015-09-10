@@ -460,3 +460,175 @@ module.exports = angular.module('app', [
 If you noticed I put our new filter before the service that's already there-- I'm just keeping things alphabetical. Just a preference.
 
 Ok, check Karma and our test should be passing now!
+
+## End to end testing (e2e) with Protractor
+
+Now we'll set up Protractor so we can create test things that happen on pages.
+
+### Organization
+
+Let's change our organization a little:
+
+```
+|-- test
+|   |-- unit
+|   |   |-- filters.spec.js
+|   |   |-- services.spec.js
+|   |-- e2e
+```
+
+Now update your **karma.conf.js**. Replace `'test/**/*.js'` with `'test/unit/**/*.js'`.
+
+### Serve up the app
+
+We need a site to serve up, so **dist/index.html**:
+
+```html
+<!DOCTYPE html>
+<html lang="en" ng-app="app">
+<head>
+    <meta charset="utf-8">
+    <title>JS TDD Sample App</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>JS TDD Sample App</h1>
+        <div ng-view></div>
+    </div>
+<script src="bundle.js"></script>
+</body>
+</html>
+```
+
+And we'll need the view we referenced in our routes file, **dist/views/home.html**:
+
+```html
+<p>{{greeting}}</p>
+```
+
+You can use whatever you want to serve up the app (Nginx, Apache, Node, PHP, etc). I'm using httpster. It's a simple http webserver.
+
+```bash
+npm install -g httpster
+cd dist/
+httpster
+```
+
+Now my app is being served up to [http://localhost:3333](http://localhost:3333).
+
+### Install and configure Protractor
+
+Install Protractor globally so we can use the `protrator` command-line utility:
+
+```bash
+npm install -g protractor
+```
+
+The above command also installs the `webdriver-manager` utility. We need to install the required binaries before it'll work:
+
+```
+webdriver-manager update
+```
+
+We'll need a config file. We have to create it manually, **protractor.conf.js**:
+
+```js
+exports.config = {
+    framework: 'jasmine2',
+    specs: ['test/e2e/**/*.js'],
+    directConnect: true,
+    capabilities: {
+        browserName: 'chrome',
+        shardTestFiles: true,
+        maxInstances: 5
+    }
+};
+```
+
+Using `directConnect` and `chrome` runs the tests locally instead of using Selenium Server. And using `shardTestFiles` and `maxInstances` allows Protractor to run tests asynchronously (for better performance).
+
+### Directive
+
+Create a directive test, **test/e2e/directives.spec.js**:
+
+```js
+describe('Directive', function() {
+
+    describe('btn', function() {
+
+        beforeEach(function() {
+            browser.get('/#/test/btn');
+        });
+
+        it('element should exist', function() {
+            expect($('#btn > button').isPresent()).toBeTruthy();
+        });
+
+        it('element should have "btn" and "btn-default" classes', function() {
+            expect($('#btn > button.btn.btn-default').isPresent()).toBeTruthy();
+        });
+
+        it('element text should be the value from the label attribute', function() {
+            expect($('#btn[label="Click me"] > button.btn.btn-default').isPresent()).toBeTruthy();
+            expect($('#btn[label="Click me"] > button.btn.btn-default').getText()).toMatch(/^Click me$/);
+        });
+    });
+});
+```
+
+Run protractor:
+
+```bash
+protractor protractor.conf.js
+```
+
+Our test should fail. Now create the directive, **src/js/modules/directives/btn.js**:
+
+```js
+angular.module('btn', [])
+    .directive('btn', function() {
+        return {
+            scope: {label: '@'},
+            template: '<button class="btn btn-default">{{label}}</button>'
+        };
+    });
+```
+
+**Note:** Remember to require the new module in **src/js/modules/app.js** and include it in the app module.
+
+Create a route and a view to test our directive.
+
+**src/js/modules/routes.js**:
+
+```js
+module.exports = function ($routeProvider) {
+
+    $routeProvider
+        // HOME
+        .when('/', {
+            templateUrl: 'views/home.html',
+            controller:  'HomeController'
+        })
+        // TESTS
+        .when('/test/btn', {
+            templateUrl: 'views/test/btn.html'
+        })
+        // DEFAULT
+        .otherwise({
+            redirectTo: '/'
+        });
+};
+```
+
+**dist/views/test/btn.html**:
+
+```html
+<btn id="btn" label="Click me"></btn>
+```
+
+Now our test should pass:
+
+```bash
+protractor protractor.conf.js
+```
