@@ -251,3 +251,212 @@ The ouput you see on the command line when Karama runs is produced by the "progr
 My preferred reporter is the [Nyan reporter](https://www.npmjs.com/package/karma-nyan-reporter):
 
 ![nyan reporter](https://raw.githubusercontent.com/dgarlitt/image-repo/master/karma-nyan-reporter/v0.2.2/karma-nyan-reporter.gif)
+
+## Testing AngularJS
+
+Let's add AngularJS:
+
+```bash
+npm install --save angular angualr-route
+```
+
+Update **src/js/main.js** (remove the square.js require statement):
+
+```js
+// Our AngularJS app
+require('./modules/app.js');
+```
+
+**Note:** If I'm going to use Twitter Bootstrap's JS, Semantic UI, etc-- **main.js** is where I include it.
+
+Remove **src/js/modules/general/square.js** and add **src/js/modules/services/square**:
+
+```js
+angular.module('square', [])
+    .factory('square', function() {
+        return function (num) {
+            return num * num;
+        };
+    });
+```
+
+Create **src/js/modules/app.js**:
+
+```js
+/**
+ * Require AngularJS
+ */
+require('angular');
+require('angular-route');
+// Modules
+require('./controllers.js');
+require('./services/square.js');
+
+//  _  _ ____     _      _  _
+// | \|_|_ | |\ ||_  /\ |_)|_)
+// |_/|_| _|_| \||_ /--\|  |
+//
+module.exports = angular.module('app', [
+    'ngRoute',
+    'controllers',
+    'square'
+]).config(['$routeProvider', require('./routes.js')]);
+```
+
+**src/js/modules/controllers.js**:
+
+```js
+angular.module('controllers', [])
+    /**
+     * Home Controller
+     */
+    .controller('HomeController', ['$scope', function($scope) {
+        $scope.greeting = 'Hello, World';
+    }]);
+```
+
+**src/js/modules/routes.js**:
+
+```js
+module.exports = function ($routeProvider) {
+
+    $routeProvider
+        // HOME
+        .when('/', {
+            templateUrl: 'views/home.html',
+            controller:  'HomeController'
+        })
+        // DEFAULT
+        .otherwise({
+            redirectTo: '/'
+        });
+};
+```
+
+Now remove **test/square.spec.js** and add **test/services.spec.js**:
+
+```js
+describe('Services', function() {
+
+    beforeEach(function() {
+        // Bring our app module that has all of our services attached to it.
+        module('app');
+    });
+
+    it('square should return the square of the number it is passed', function() {
+        var square;
+
+        inject(function(_square_){
+            square = _square_;
+        });
+
+        expect(square(0)).toBe(0 * 0);
+        expect(square(1)).toBe(1 * 1);
+        expect(square(5)).toBe(5 * 5);
+        expect(square(279217897291798792)).toBe(279217897291798792 * 279217897291798792);
+        expect(square(-7)).toBe(-7 * -7);
+    });
+});
+```
+
+In order for our updated test to work, we need Angular's ngMock:
+
+```bash
+npm install --save-dev angular-mocks
+```
+
+Now include it in our **karma.conf.js**:
+
+```js
+// list of files / patterns to load in the browser
+files: [
+  'dist/bundle.js',
+  'node_modules/angular-mocks/angular-mocks.js',
+  'test/**/*.js'
+],
+```
+
+**Note:** **angular-mocks.js** depends on **angular.js**, so the order here is important. We need to include **angular-mocks.js** after we include **angular.js** which is part of **bundle.js**.
+
+Now test!
+
+```bash
+karma start
+```
+
+Again, I like to break my test to make sure everything is working and then change it back.
+
+### Filter
+
+We tested a service. Let's test a filter **test/filters.spec.js**:
+
+```js
+describe('Filters', function() {
+
+    var $filter;
+
+    beforeEach(function() {
+        // Bring our app module that has all of our filters attached to it.
+        module('app');
+        // This makes filter testing work. :shrug:
+        // @link https://docs.angularjs.org/guide/unit-testing
+        inject(function(_$filter_){
+            $filter = _$filter_;
+        });
+    });
+
+    it('camelcase filter should transform text', function() {
+        var camelcase = $filter('camelcase');
+        expect(camelcase('Hello World')).toMatch('helloWorld');
+    });
+});
+```
+
+Check karma to make sure our test failed.
+
+**src/js/modules/filters/camelcase.js**:
+
+```js
+angular.module('camelcase', [])
+    .filter('camelcase', function() {
+        return function (text) {
+            return text.replace(/(?:^\w|[A-Z]|\b\w|\s+)/g, function (match, index) {
+                if (+match === 0) {
+                    return "";
+                }
+                return index === 0 ? match.toLowerCase() : match.toUpperCase();
+            });
+        };
+    });
+```
+
+And update **src/js/modules/app.js**:
+
+```js
+/**
+ * Require AngularJS
+ */
+require('angular');
+require('angular-route');
+// Modules
+require('./controllers.js');
+require('./filters/camelcase.js');
+require('./services/square.js');
+
+//  _  _ ____     _      _  _
+// | \|_|_ | |\ ||_  /\ |_)|_)
+// |_/|_| _|_| \||_ /--\|  |
+//
+module.exports = angular.module('app', [
+    'ngRoute',
+    'controllers',
+    // FILTERS
+    'camelcase',
+    // SERVICES
+    'square'
+]).config(['$routeProvider', require('./routes.js')]);
+```
+
+If you noticed I put our new filter before the service that's already there-- I'm just keeping things alphabetical. Just a preference.
+
+Ok, check Karma and our test should be passing now!
