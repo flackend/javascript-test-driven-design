@@ -3,8 +3,12 @@
   "version": "0.0.1",
   "description": "Learning JavaScript TDD.",
   "main": "src/js/main.js",
-  "dependencies": {},
+  "dependencies": {
+    "angular": "^1.4.5",
+    "angular-route": "^1.4.5"
+  },
   "devDependencies": {
+    "angular-mocks": "^1.4.5",
     "browserify": "^11.0.1",
     "gulp": "^3.9.0",
     "gulp-sourcemaps": "^1.5.2",
