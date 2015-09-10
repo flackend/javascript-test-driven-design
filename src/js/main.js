@@ -1,1 +1,2 @@
-window.square = require('./modules/general/square.js');
+// Our AngularJS app
+require('./modules/app.js');
