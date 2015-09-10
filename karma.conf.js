@@ -17,7 +17,7 @@ module.exports = function(config) {
     files: [
       'dist/bundle.js',
       'node_modules/angular-mocks/angular-mocks.js',
-      'test/**/*[sS]pec.js'
+      'test/unit/**/*[sS]pec.js'
     ],
 
 
