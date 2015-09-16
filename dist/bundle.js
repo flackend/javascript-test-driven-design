@@ -29701,6 +29701,7 @@ require('angular-route');
 require('./controllers.js');
 require('./filters/camelcase.js');
 require('./services/square.js');
+require('./directives/btn.js');
 
 //  _  _ ____     _      _  _
 // | \|_|_ | |\ ||_  /\ |_)|_)
@@ -29709,12 +29710,14 @@ require('./services/square.js');
 module.exports = angular.module('app', [
     'ngRoute',
     'controllers',
+    // DIRECTIVES
+    'btn',
     // FILTERS
     'camelcase',
     // SERVICES
     'square'
 ]).config(['$routeProvider', require('./routes.js')]);
-},{"./controllers.js":7,"./filters/camelcase.js":8,"./routes.js":9,"./services/square.js":10,"angular":4,"angular-route":2}],7:[function(require,module,exports){
+},{"./controllers.js":7,"./directives/btn.js":8,"./filters/camelcase.js":9,"./routes.js":10,"./services/square.js":11,"angular":4,"angular-route":2}],7:[function(require,module,exports){
 angular.module('controllers', [])
     /**
      * Home Controller
@@ -29723,6 +29726,14 @@ angular.module('controllers', [])
         $scope.greeting = 'Hello, World';
     }]);
 },{}],8:[function(require,module,exports){
+angular.module('btn', [])
+    .directive('btn', function() {
+        return {
+            scope: {label: '@'},
+            template: '<button class="btn btn-default">{{label}}</button>'
+        };
+    });
+},{}],9:[function(require,module,exports){
 angular.module('camelcase', [])
     .filter('camelcase', function() {
         return function (text) {
@@ -29734,7 +29745,7 @@ angular.module('camelcase', [])
             });
         };
     });
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 module.exports = function ($routeProvider) {
 
     $routeProvider
@@ -29743,12 +29754,16 @@ module.exports = function ($routeProvider) {
             templateUrl: 'views/home.html',
             controller:  'HomeController'
         })
+        // TESTS
+        .when('/test/btn', {
+            templateUrl: 'views/test/btn.html'
+        })
         // DEFAULT
         .otherwise({
             redirectTo: '/'
         });
 };
-},{}],10:[function(require,module,exports){
+},{}],11:[function(require,module,exports){
 angular.module('square', [])
     .factory('square', function() {
         return function (num) {

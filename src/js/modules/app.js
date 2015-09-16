@@ -7,6 +7,7 @@ require('angular-route');
 require('./controllers.js');
 require('./filters/camelcase.js');
 require('./services/square.js');
+require('./directives/btn.js');
 
 //  _  _ ____     _      _  _
 // | \|_|_ | |\ ||_  /\ |_)|_)
@@ -15,6 +16,8 @@ require('./services/square.js');
 module.exports = angular.module('app', [
     'ngRoute',
     'controllers',
+    // DIRECTIVES
+    'btn',
     // FILTERS
     'camelcase',
     // SERVICES
