@@ -38,7 +38,7 @@ Create the first spec at **spec/square.spec.js**:
 var square = require('../src/square.js') ;
 
 describe('square', function() {
-    it('should return the quare of the number it is passed', function() {
+    it('should return the square of the number it is passed', function() {
         expect(square(0)).toBe(0 * 0);
         expect(square(1)).toBe(1 * 1);
         expect(square(5)).toBe(5 * 5);
@@ -139,9 +139,9 @@ Organization is up to you. The only requirement for working with Browserify is t
 |-- src
 |   |-- js
 |   |   |-- main.js
-|   |   |   |-- modules
-|   |   |   |   |-- general
-|   |   |   |   |   |-- square.js
+|   |   |-- modules
+|   |   |   |-- general
+|   |   |   |   |-- square.js
 ```
 So to follow this example, create the folders, move **square.js** and create **main.js**:
 
