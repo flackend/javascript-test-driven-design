@@ -149,7 +149,7 @@ So to follow this example, create the folders, move **square.js** and create **m
 window.square = require('./modules/general/square.js');
 ```
 
-We're putting `square` on `window` so that everything has access to it (including our tests). But this we'll change that when we turn this into an AngularJS project later.
+We're putting `square` on `window` so that everything has access to it (including our tests). But we'll change that when we turn this into an AngularJS project later.
 
 #### Bundling
 
@@ -218,7 +218,7 @@ Before you can run gulp, you need to install it and all the other libaries we're
 npm install --save-dev lodash.assign browserify vinyl-buffer gulp gulp-util vinyl-source-stream gulp-sourcemaps watchify
 ```
 
-Notice that we use `--save-dev` since we only will be running gulp during development. You may need to adjust the Browserify entry point and output file in your **gulpfile.js** if you're organizing your project differently.
+Notice that we use `--save-dev` since we only ever run gulp during development. You may need to adjust the Browserify entry point and output file in your **gulpfile.js** if you're organizing your project differently.
 
 Now you can run gulp:
 
@@ -226,7 +226,7 @@ Now you can run gulp:
 gulp
 ```
 
-Since we're using **watchify** in our **gulpfile.js**, gulp won't exit. Instead it watches for changes to the files it bundled and rebundles as needed. Watchify is a special watcher built to work with Browserify. Instead of rebundling your whole bundle, it only recompiles what has changed. This cuts down on the processing time significantly.
+Since we're using **watchify** in our **gulpfile.js**, gulp won't exit. Instead it watches for changes to the files it bundled and rebundles whenever it detects a change. Watchify is a special watcher built to work with Browserify. Instead of rebundling your whole bundle, it only recompiles what has changed. This cuts down on the processing time significantly.
 
 You should have a new **bundle.js** and **bundle.js.map** in your **dist** folder.
 
@@ -463,7 +463,7 @@ Ok, check Karma and our test should be passing now!
 
 ## End to end testing (e2e) with Protractor
 
-Now we'll set up Protractor so we can create test things that happen on pages.
+Now we'll set up Protractor so we can test things that happen on pages.
 
 ### Organization
 
